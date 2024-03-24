@@ -1,3 +1,4 @@
+using MBT;
 using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
@@ -36,6 +37,15 @@ public abstract class Weapon : MonoBehaviour
     }
 
     public virtual bool CanPrimaryAttack() => true;
+
+    public virtual bool CanAttack()
+    {
+
+        Vector3 viewportPosition = Camera.main.WorldToViewportPoint(owner.transform.position);
+        if (viewportPosition.x <= 0 || viewportPosition.x >= 1 || viewportPosition.y <= 0 || viewportPosition.y >= 1) return false;
+
+        return true;
+    }
 
     public virtual WeaponInstanceInfo GenerateWeaponInstanceInfo(bool randomize = false) => new WeaponInstanceInfo();
     public abstract void LoadWeaponInstanceInfo(WeaponInstanceInfo weaponInstanceInfo);

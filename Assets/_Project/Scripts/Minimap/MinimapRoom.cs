@@ -45,7 +45,7 @@ public class MinimapRoom : MonoBehaviour
 
     public void VisitRoom()
     {
-        if(state == RoomState.NotVisited)
+        if(state == RoomState.NotVisited || state == RoomState.Unseen)
         {
             state = RoomState.Visiting;
             ChangeMaterial(minimapVisiting);

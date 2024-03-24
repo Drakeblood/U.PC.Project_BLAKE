@@ -200,7 +200,8 @@ public class Room : MonoBehaviour
         if (IsPlayerInside()) return;
         minimapRoom.VisitRoom();
         Room activeRoom = roomManager.GetActiveRoom();
-        if (activeRoom != null && activeRoom != this)
+        this.gameObject.SetActive(true);
+        /*if (activeRoom != null && activeRoom != this)
         {
             List<Room> roomsToDisable = activeRoom.GetNeigbours();
             if (roomsToDisable.Contains(this)) roomsToDisable.Remove(this);
@@ -208,8 +209,8 @@ public class Room : MonoBehaviour
             {
                 room.DisableRoom();
             }
-        }
-        List<Room> roomsToActivate = GetNeigbours();
+        }*/
+        /*List<Room> roomsToActivate = GetNeigbours();
         if (roomsToActivate.Contains(activeRoom)) roomsToActivate.Remove(activeRoom);
 
 
@@ -217,7 +218,7 @@ public class Room : MonoBehaviour
         {
             room.SeeRoom();
             room.gameObject.SetActive(true);
-        }
+        }*/
 
         roomManager.SetActiveRoom(this);
 
