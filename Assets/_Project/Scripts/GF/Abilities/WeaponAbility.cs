@@ -17,7 +17,7 @@ namespace GameFramework.Abilities
                     return false; 
                 }
             }
-            return weaponSource.CanPrimaryAttack() && base.CanActivateAbility();
+            return weaponSource.CanPrimaryAttack() && base.CanActivateAbility() && weaponSource.Owner.IsAlive;
         }
 
         public sealed override void ActivateAbility()

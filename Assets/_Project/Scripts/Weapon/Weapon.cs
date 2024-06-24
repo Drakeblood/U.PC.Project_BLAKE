@@ -8,8 +8,8 @@ namespace _Project.Scripts.Weapon
         public WeaponDefinition WeaponDefinition;
 
         //BlakeCharacter
-        private GameObject owner;
-        public GameObject Owner
+        private BlakeCharacter owner;
+        public BlakeCharacter Owner
         {
             get => owner;
             set

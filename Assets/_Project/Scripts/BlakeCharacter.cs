@@ -20,6 +20,8 @@ public abstract class BlakeCharacter : MonoBehaviour, IDamageable
 
     public int RespawnsLeft => maxRespawns - respawnCounter;
 
+    public bool IsAlive => !isDead;
+
     private bool hasShield = false;
 
     protected int respawnCounter = 0;

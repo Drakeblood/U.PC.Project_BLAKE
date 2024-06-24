@@ -140,7 +140,7 @@ namespace _Project.Scripts.Weapon
 
             if (weapon.TryGetComponent(out Weapon weaponComp))
             {
-                weaponComp.Owner = gameObject;
+                weaponComp.Owner = gameObject.GetComponent<BlakeCharacter>();
             }
 
             weapons[index] = weapon.GetComponent<Weapon>();

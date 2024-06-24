@@ -24,7 +24,7 @@ public class AIController : MonoBehaviour
     private void Awake()
     {
         UpdatePlayerRef();
-        Weapon.Owner = gameObject;
+        Weapon.Owner = gameObject.GetComponent<BlakeCharacter>();
 
         NavMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
