@@ -793,6 +793,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomType: 0
+  roomSize: 2
   doors:
   - {fileID: 7801296454333592680}
   - {fileID: 644041710573202379}

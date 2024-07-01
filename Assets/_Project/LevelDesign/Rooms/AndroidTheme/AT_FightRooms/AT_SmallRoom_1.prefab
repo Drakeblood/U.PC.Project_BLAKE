@@ -440,8 +440,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2171126759078518847}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 2.5478544e-14}
+  m_LocalPosition: {x: -9.9850025, y: 0, z: -17.985}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -473,6 +473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomType: 0
+  roomSize: 0
   doors:
   - {fileID: 2160034033456435226}
   - {fileID: 9167884089363303011}
@@ -496,7 +497,7 @@ MonoBehaviour:
       type: 3}
     EnemyWaypoints: {fileID: 3786216101665479334}
   spawnedEnemies: []
-  isInitialized: 0
+  isInitialized: 1
   isBeaten: 0
   spawnPoint: {fileID: 2417886148915629074}
   gCost: 0
@@ -691,7 +692,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1f72c9a012fd7024c94ac5f4ed0bf421, type: 2}
+  - {fileID: 2100000, guid: 6cc7b06aec1548c4aa1c5d6aee3100af, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1784,6 +1785,16 @@ PrefabInstance:
       propertyPath: mainRoom
       value: 
       objectReference: {fileID: 3506375193716711652}
+    - target: {fileID: 4200503237609755824, guid: be02f6d2c5654034ebec1a2859efb68b,
+        type: 3}
+      propertyPath: interactable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4331371079676472112, guid: be02f6d2c5654034ebec1a2859efb68b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5761699083240367011, guid: be02f6d2c5654034ebec1a2859efb68b,
         type: 3}
       propertyPath: m_Name
@@ -5726,6 +5737,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8736427752958271802, guid: be02f6d2c5654034ebec1a2859efb68b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be02f6d2c5654034ebec1a2859efb68b, type: 3}
 --- !u!4 &3415246804242310271 stripped
@@ -6798,6 +6814,16 @@ PrefabInstance:
       propertyPath: mainRoom
       value: 
       objectReference: {fileID: 3506375193716711652}
+    - target: {fileID: 4200503237609755824, guid: be02f6d2c5654034ebec1a2859efb68b,
+        type: 3}
+      propertyPath: interactable
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4331371079676472112, guid: be02f6d2c5654034ebec1a2859efb68b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5761699083240367011, guid: be02f6d2c5654034ebec1a2859efb68b,
         type: 3}
       propertyPath: m_Name

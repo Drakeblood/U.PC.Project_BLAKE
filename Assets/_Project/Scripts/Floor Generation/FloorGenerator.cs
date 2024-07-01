@@ -16,7 +16,16 @@ public class FloorGenerator : MonoBehaviour
     [SerializeField]
     private RoomPool baseRoomPool;
     [SerializeField]
-    private int maxBaseRooms = 3;
+    private int smallRoomAmount = 3;
+    private int smallRoomCount = 0;
+
+    [SerializeField]
+    private int mediumRoomAmount = 3;
+    private int mediumRoomCount = 0;
+
+    [SerializeField]
+    private int largeRoomAmount = 3;
+    private int largeRoomCount = 0;
 
     [Header("Treasure Room Settings")]
     [SerializeField]
@@ -32,9 +41,15 @@ public class FloorGenerator : MonoBehaviour
     private GameObject startingRoom;
 
     [SerializeField]
+    private GameObject characterShop;
+
+    [SerializeField]
+    private GameObject weaponShop;
+
+    [SerializeField]
     private LayerMask layerMask;
 
-    private int roomCounter = 1;
+    private int roomCounter = 0;
 
     private RoomManager roomManager;
     private FloorManager floorManager;
@@ -57,7 +72,7 @@ public class FloorGenerator : MonoBehaviour
 
     public IEnumerator GenerateFloor()
     {
-        maxRooms = maxBaseRooms + treasureRoomsAmount;
+        maxRooms = smallRoomAmount + mediumRoomAmount + largeRoomAmount + treasureRoomsAmount;
         if (ReferenceManager.SceneHandler != null)
         {
             ReferenceManager.SceneHandler.roomsToGenerate = maxRooms - 1;
@@ -80,16 +95,23 @@ public class FloorGenerator : MonoBehaviour
 
         tries = 0;
         //Generate Base Floors
-        yield return StartCoroutine(GenerateBaseRoomsFromPool(baseRoomPool, maxBaseRooms));
+        yield return StartCoroutine(GenerateBaseRoomsFromPool(baseRoomPool, smallRoomAmount + mediumRoomAmount + largeRoomAmount));
 
-        //Generate End Room
-        tries = 0;
-        GenerateEndRoom();
+
 
         tries = 0;
         //Generate TreasureRooms
         yield return StartCoroutine(GenerateSpecialRoomsFromPool(treasureRoomPool, treasureRoomsAmount));
 
+        tries = 0;
+        GenerateCharacterShop();
+
+        tries = 0;
+        GenerateWeaponShop();
+
+        //Generate End Room
+        tries = 0;
+        GenerateEndRoom();
 
         foreach (GameObject room in spawnedRooms)
         {
@@ -119,6 +141,45 @@ public class FloorGenerator : MonoBehaviour
         return map;
     }
 
+    private GameObject GetRandomSizedRoom(RoomPool pool)
+    {
+        List<RoomSize> availableSizes = new List<RoomSize>();
+
+        if (smallRoomCount < smallRoomAmount)
+            availableSizes.Add(RoomSize.Small);
+        if (mediumRoomCount < mediumRoomAmount)
+            availableSizes.Add(RoomSize.Medium);
+        if (largeRoomCount < largeRoomAmount)
+            availableSizes.Add(RoomSize.Large);
+
+        if (availableSizes.Count == 0)
+        {
+            //Debug.LogError("No available rooms of any size left!");
+            return null;
+        }
+
+        RoomSize selectedSize = availableSizes[Random.Range(0, availableSizes.Count)];
+        GameObject selectedRoom = pool.GetRandomRoomOfSize(selectedSize);
+        if(selectedRoom == null)
+        {
+            switch (selectedSize)
+            {
+                case RoomSize.Small:
+                    smallRoomAmount = 0;
+                    break;
+                case RoomSize.Medium:
+                    mediumRoomAmount = 0;
+                    break;
+                case RoomSize.Large:
+                    largeRoomAmount = 0;
+                    break;
+            }
+            return GetRandomSizedRoom(pool);
+        }
+        
+        return selectedRoom;
+    }
+
     private IEnumerator GenerateBaseRoomsFromPool(RoomPool pool, int amountOfRooms)
     {
         int tempCounter = 0;
@@ -141,7 +202,9 @@ public class FloorGenerator : MonoBehaviour
                 int randomNumber = Random.Range(0, roomScript.GetDoors().Length);
                 RoomConnector door = roomScript.GetDoors()[randomNumber];
                 if (door.GetConnector() != null) continue;
-                GameObject newRoom = Instantiate(pool.GetRandomRoomFromPool());
+                GameObject roomToSpawn = GetRandomSizedRoom(pool);
+                if (roomToSpawn == null) roomToSpawn = pool.GetRandomRoomFromPool();
+                var newRoom = Instantiate(roomToSpawn);
                 int randomDoor = Random.Range(0, newRoom.GetComponent<Room>().GetDoors().Length);
                 RoomConnector newDoor = newRoom.GetComponent<Room>().GetDoors()[randomDoor];
 
@@ -150,6 +213,19 @@ public class FloorGenerator : MonoBehaviour
                 if (success)
                 {
                     FinalizeRoomPlacement(newRoom, door, newDoor, map);
+                    // Update the count based on the selected size
+                    switch (newRoom.GetComponent<Room>().roomSize)
+                    {
+                        case RoomSize.Small:
+                            smallRoomCount++;
+                            break;
+                        case RoomSize.Medium:
+                            mediumRoomCount++;
+                            break;
+                        case RoomSize.Large:
+                            largeRoomCount++;
+                            break;
+                    }
                     toAdd.Add(newRoom);
                     tempCounter++;
                 }
@@ -217,7 +293,6 @@ public class FloorGenerator : MonoBehaviour
                 RoomConnector newDoor = newRoom.GetComponent<Room>().GetDoors()[randomDoor];
 
                 bool success = TryPositionRoom(room, newRoom, door, newDoor);
-
                 if (success)
                 {
                     FinalizeRoomPlacement(newRoom, door, newDoor, map);
@@ -248,6 +323,7 @@ public class FloorGenerator : MonoBehaviour
     {
         int tempCounter = 0;
         FloorPathfinding floorPathfinding = new FloorPathfinding(spawnedRooms);
+        var list = pathLength.OrderBy(key => key.Value).Reverse().Select(key => key.Key.gameObject).ToList();
 
         if (tries >= 200)
         {
@@ -258,30 +334,32 @@ public class FloorGenerator : MonoBehaviour
 
         List<GameObject> toAdd = new List<GameObject>();
 
-        foreach (GameObject room in spawnedRooms)
+        foreach (GameObject room in list)
         {
             Room roomScript = room.GetComponent<Room>();
-            int randomNumber = Random.Range(0, roomScript.GetDoors().Length);
-            RoomConnector door = roomScript.GetDoors()[randomNumber];
-            if (door.GetConnector() != null) continue;
-            GameObject newRoom = Instantiate(endRoom);
-            int randomDoor = Random.Range(0, newRoom.GetComponent<Room>().GetDoors().Length);
-            RoomConnector newDoor = newRoom.GetComponent<Room>().GetDoors()[randomDoor];
-
-            bool success = TryPositionRoom(room, newRoom, door, newDoor);
-
-            if (success)
+            bool success = false;
+            foreach (var door in roomScript.GetDoors())
             {
-                FinalizeRoomPlacement(newRoom, door, newDoor, map);
-                toAdd.Add(newRoom);
-                tempCounter++;
-                break;
-            }
-            else
-            {
-                Destroy(newRoom);
-            }
+                if (door.GetConnector() != null) continue;
+                GameObject newRoom = Instantiate(endRoom);
+                int randomDoor = Random.Range(0, newRoom.GetComponent<Room>().GetDoors().Length);
+                RoomConnector newDoor = newRoom.GetComponent<Room>().GetDoors()[randomDoor];
 
+                success = TryPositionRoom(room, newRoom, door, newDoor);
+
+                if (success)
+                {
+                    FinalizeRoomPlacement(newRoom, door, newDoor, map);
+                    toAdd.Add(newRoom);
+                    tempCounter++;
+                    break;
+                }
+                else
+                {
+                    Destroy(newRoom);
+                }
+            }
+            if (success) break;
         }
 
         if(toAdd.Count == 0)
@@ -306,11 +384,142 @@ public class FloorGenerator : MonoBehaviour
         }
     }
 
+    int shopTries = 0;
+    public void GenerateWeaponShop()
+    {
+        if (weaponShop == null) return;
+        shopTries = 0;
+        int tempCounter = 0;
+        FloorPathfinding floorPathfinding = new FloorPathfinding(spawnedRooms);
+
+        if (tries >= 200)
+        {
+            Debug.LogWarning("Broken generation due to too many tries");
+            return;
+        }
+
+
+        List<GameObject> toAdd = new List<GameObject>();
+
+        foreach (GameObject room in spawnedRooms)
+        {
+            Room roomScript = room.GetComponent<Room>();
+            int randomNumber = Random.Range(0, roomScript.GetDoors().Length);
+            RoomConnector door = roomScript.GetDoors()[randomNumber];
+            if (door.GetConnector() != null) continue;
+            GameObject newRoom = Instantiate(weaponShop);
+            int randomDoor = Random.Range(0, newRoom.GetComponent<Room>().GetDoors().Length);
+            RoomConnector newDoor = newRoom.GetComponent<Room>().GetDoors()[randomDoor];
+
+            bool success = TryPositionRoom(room, newRoom, door, newDoor);
+
+            if (success)
+            {
+                FinalizeRoomPlacement(newRoom, door, newDoor, map);
+                toAdd.Add(newRoom);
+                tempCounter++;
+                break;
+            }
+            else
+            {
+                Destroy(newRoom);
+            }
+
+        }
+
+        if (toAdd.Count == 0)
+        {
+            if (shopTries < 100)
+            {
+                shopTries++;
+                GenerateWeaponShop();
+                return;
+            }
+            Debug.LogError("WEAPON SHOP DIDN'T SPAWNED");
+        }
+
+        foreach (GameObject room in toAdd)
+        {
+            spawnedRooms.Add(room);
+            spawnedBaseRooms.Add(room);
+            if (pathLength.ContainsKey(room.GetComponent<Room>())) continue;
+            floorPathfinding = new FloorPathfinding(spawnedRooms);
+            List<Room> path = floorPathfinding.FindPath(spawnedRooms[0], room);
+            pathLength.Add(room.GetComponent<Room>(), path.Count);
+        }
+    }
+
+    public void GenerateCharacterShop()
+    {
+        if (characterShop == null) return;
+        shopTries = 0;
+
+        int tempCounter = 0;
+        FloorPathfinding floorPathfinding = new FloorPathfinding(spawnedRooms);
+
+        if (tries >= 200)
+        {
+            Debug.LogWarning("Broken generation due to too many tries");
+            return;
+        }
+
+
+        List<GameObject> toAdd = new List<GameObject>();
+
+        foreach (GameObject room in spawnedRooms)
+        {
+            Room roomScript = room.GetComponent<Room>();
+            int randomNumber = Random.Range(0, roomScript.GetDoors().Length);
+            RoomConnector door = roomScript.GetDoors()[randomNumber];
+            if (door.GetConnector() != null) continue;
+            GameObject newRoom = Instantiate(characterShop);
+            int randomDoor = Random.Range(0, newRoom.GetComponent<Room>().GetDoors().Length);
+            RoomConnector newDoor = newRoom.GetComponent<Room>().GetDoors()[randomDoor];
+
+            bool success = TryPositionRoom(room, newRoom, door, newDoor);
+
+            if (success)
+            {
+                FinalizeRoomPlacement(newRoom, door, newDoor, map);
+                toAdd.Add(newRoom);
+                tempCounter++;
+                break;
+            }
+            else
+            {
+                Destroy(newRoom);
+            }
+
+        }
+
+        if (toAdd.Count == 0)
+        {
+            if (shopTries < 100)
+            {
+                shopTries++;
+                GenerateCharacterShop();
+                return;
+            }
+            Debug.LogError("CHARACTER SHOP DIDN'T SPAWNED");
+        }
+
+        foreach (GameObject room in toAdd)
+        {
+            spawnedRooms.Add(room);
+            spawnedBaseRooms.Add(room);
+            if (pathLength.ContainsKey(room.GetComponent<Room>())) continue;
+            floorPathfinding = new FloorPathfinding(spawnedRooms);
+            List<Room> path = floorPathfinding.FindPath(spawnedRooms[0], room);
+            pathLength.Add(room.GetComponent<Room>(), path.Count);
+        }
+    }
+
     private bool TryPositionRoom(GameObject room, GameObject newRoom, RoomConnector doorToConnect, RoomConnector newDoor)
     {
 
         // Calculate the rotation needed to match the new door with the door to connect
         Quaternion rotationToMatchDoors = Quaternion.LookRotation(-doorToConnect.transform.forward);
+        newRoom.transform.rotation = Quaternion.identity;
         newRoom.transform.rotation = rotationToMatchDoors * Quaternion.Inverse(newDoor.transform.rotation);
 
         // Calculate the position offset to match the new door with the door to connect

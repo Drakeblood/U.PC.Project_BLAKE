@@ -227,6 +227,12 @@ PrefabInstance:
         type: 2}
     - target: {fileID: 3194443941187315569, guid: e02126aae2951bf4b9b740ef58abdbcf,
         type: 3}
+      propertyPath: weaponShop
+      value: 
+      objectReference: {fileID: 2171126759078518847, guid: b387b61f335b3d4468ac9a7b463ccdfc,
+        type: 3}
+    - target: {fileID: 3194443941187315569, guid: e02126aae2951bf4b9b740ef58abdbcf,
+        type: 3}
       propertyPath: maxBaseRooms
       value: 7
       objectReference: {fileID: 0}
@@ -235,6 +241,12 @@ PrefabInstance:
       propertyPath: startingRoom
       value: 
       objectReference: {fileID: 2171126759078518847, guid: 347f7a73d56c7324081261954a40d0ba,
+        type: 3}
+    - target: {fileID: 3194443941187315569, guid: e02126aae2951bf4b9b740ef58abdbcf,
+        type: 3}
+      propertyPath: characterShop
+      value: 
+      objectReference: {fileID: 2171126759078518847, guid: b4fdfdd519b4e904eab6d87acbfd51d7,
         type: 3}
     - target: {fileID: 3194443941187315569, guid: e02126aae2951bf4b9b740ef58abdbcf,
         type: 3}

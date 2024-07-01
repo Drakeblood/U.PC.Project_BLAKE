@@ -12,10 +12,18 @@ public enum RoomType
     Boss
 }
 
+public enum RoomSize
+{
+    Small,
+    Medium,
+    Large
+}
+
 public class Room : MonoBehaviour
 {
     [SerializeField]
     private RoomType roomType = RoomType.Base;
+    public RoomSize roomSize = RoomSize.Small;
 
     [SerializeField]
     private RoomConnector[] doors;
@@ -175,6 +183,16 @@ public class Room : MonoBehaviour
     public RoomConnector[] GetDoors()
     {
         return doors;
+    }
+
+    public RoomConnector[] GetFreeDoors()
+    {
+        List<RoomConnector> freeDoors = new List<RoomConnector>();
+        foreach(RoomConnector door in doors)
+        {
+            if(door.GetConnector() == null) freeDoors.Add(door);
+        }
+        return freeDoors.ToArray();
     }
 
     public void SeeRoom()
